@@ -1,0 +1,11 @@
+# editor settings
+.vscode/
+
+# compiled binaries
+*-amd64-*
+*-arm64-*
+*-amd64.exe
+*-arm64.exe
+
+# test music files
+*.mp3
