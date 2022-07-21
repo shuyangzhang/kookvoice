@@ -34,7 +34,6 @@ type gatewayRespData struct {
 
 func main() {
 	flag.Parse()
-	fmt.Printf("channel: %v, token: %v, input: %v", *CHANNEL_ID, *TOKEN, *INPUT)
 	gatewayUrl := getGatewayUrl()
 	startWebsocketClient(gatewayUrl)
 }
@@ -63,7 +62,7 @@ func getGatewayUrl() string {
 		panic(err)
 	}
 	gatewayUrl := respObj.Data.GatewayUrl
-	fmt.Printf("gateway url is %v \n", gatewayUrl)
+	// fmt.Printf("gateway url is %v \n", gatewayUrl)
 	return gatewayUrl
 }
 
@@ -97,9 +96,9 @@ func startWebsocketClient(websocketHost string) {
 		panic(err)
 	}
 
-	fmt.Println("---- start recieve first shake message ----")
+	// fmt.Println("---- start recieve first shake message ----")
 	recieveMessageOnce(connect)
-	fmt.Println("---- end recieve first shake message ----")
+	// fmt.Println("---- end recieve first shake message ----")
 
 	secondShakeReqObj := secondShakeReq{
 		Request: true,
@@ -124,9 +123,9 @@ func startWebsocketClient(websocketHost string) {
 		panic(err)
 	}
 
-	fmt.Println("---- start recieve second shake message ----")
+	// fmt.Println("---- start recieve second shake message ----")
 	recieveMessageOnce(connect)
-	fmt.Println("---- end recieve second shake message ----")
+	// fmt.Println("---- end recieve second shake message ----")
 
 	thirdShakeReqObj := thirdShakeReq{
 		Request: true,
@@ -153,9 +152,9 @@ func startWebsocketClient(websocketHost string) {
 		panic(err)
 	}
 
-	fmt.Println("---- start recieve third shake message ----")
+	// fmt.Println("---- start recieve third shake message ----")
 	thirdShakeRespStr := recieveMessageOnce(connect)
-	fmt.Println("---- end recieve third shake message ----")
+	// fmt.Println("---- end recieve third shake message ----")
 	var thirdShakeRespObj thirdShakeResp
 	err = json.Unmarshal(thirdShakeRespStr, &thirdShakeRespObj)
 	if err != nil {
@@ -209,12 +208,12 @@ func startWebsocketClient(websocketHost string) {
 		panic(err)
 	}
 
-	fmt.Println("---- start recieve fourth shake message ----")
+	// fmt.Println("---- start recieve fourth shake message ----")
 	recieveMessageOnce(connect)
-	fmt.Println("---- end recieve fourth shake message ----")
+	// fmt.Println("---- end recieve fourth shake message ----")
 
 	fmt.Println(">>>> shake hands succeed <<<<")
-	fmt.Printf("ssrc=1357 ffmpeg rtp url: \n  rtp://%v:%v?rtcpport=%v \n", ip, port, rtcpPort)
+	//fmt.Printf("ssrc=1357 ffmpeg rtp url: \n  rtp://%v:%v?rtcpport=%v \n", ip, port, rtcpPort)
 	fmt.Println(">>>> start streaming <<<<")
 
 	cmd := exec.Command(
@@ -256,9 +255,9 @@ func recieveMessageOnce(connect *websocket.Conn) []byte {
 	}
 	switch messageType {
 	case websocket.TextMessage:
-		fmt.Println(string(messageData))
+		//fmt.Println(string(messageData))
 	case websocket.BinaryMessage:
-		fmt.Println(messageData)
+		//fmt.Println(messageData)
 	case websocket.CloseMessage:
 		fmt.Println("recieved close message")
 	case websocket.PingMessage:
