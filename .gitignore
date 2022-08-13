@@ -9,3 +9,9 @@
 
 # test music files
 *.mp3
+
+# output files
+output/
+
+# ffmpeg binary files
+ffmpeg/
