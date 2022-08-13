@@ -1,4 +1,4 @@
-module github.com/shuyangzhang/kook-voice
+module github.com/shuyangzhang/kookvoice
 
 go 1.18
 
