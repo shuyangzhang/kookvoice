@@ -1,2 +1,2 @@
-# kook-voice
-kook voice sdk writing in golang
+# kookvoice
+kook voice golang library and cli tool.

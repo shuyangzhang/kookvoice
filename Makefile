@@ -1,4 +1,4 @@
-PROJECTNAME := kook-voice
+PROJECTNAME := kookvoice
 
 .PHONY: windows linux macos win lin mac all
 
