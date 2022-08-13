@@ -1,17 +1,23 @@
-//go:build !standalone
+//go:build standalone
 
 package kookvoice
 
 import (
+	_ "embed"
 	"fmt"
-	"os/exec"
+
+	"github.com/amenzhinsky/go-memexec"
 )
 
 func streamAudio(rtpUrl string, audioSource string) {
-	fmt.Println(">>>> start streaming <<<<")
+	exe, err := memexec.New(memoryBinary)
+	if err != nil {
+		panic(err)
+	}
+	defer exe.Close()
 
-	cmd := exec.Command(
-		"ffmpeg",
+	fmt.Println(">>>> start streaming <<<<")
+	cmd := exe.Command(
 		"-re",
 		"-loglevel",
 		"level+info",
