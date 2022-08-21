@@ -108,6 +108,10 @@ func (i *voiceInstance) PlayMusic(input string) error {
 	if err := i.sourceProcess.Kill(); err != nil {
 		return errors.New(fmt.Sprintf("failed to kill source process, err: %v", err))
 	}
+	_, err := i.sourceProcess.Wait()
+	if err != nil {
+		return errors.New(fmt.Sprintf("failed to wait source process exit, err: %v", err))
+	}
 
 	musicSourceCmd := exec.Command(
 		"ffmpeg",
@@ -128,7 +132,7 @@ func (i *voiceInstance) PlayMusic(input string) error {
 		">",
 		"streampipe",
 	)
-	err := musicSourceCmd.Start()
+	err = musicSourceCmd.Start()
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to start music process, err: %v", err))
 	}
