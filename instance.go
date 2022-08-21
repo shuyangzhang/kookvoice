@@ -1,6 +1,7 @@
 package kookvoice
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -105,7 +106,7 @@ func (i *voiceInstance) Init() error {
 
 func (i *voiceInstance) PlayMusic(input string) error {
 	if err := i.sourceProcess.Kill(); err != nil {
-		return err
+		return errors.New(fmt.Sprintf("failed to kill source process, err: %v", err))
 	}
 
 	musicSourceCmd := exec.Command(
@@ -129,13 +130,13 @@ func (i *voiceInstance) PlayMusic(input string) error {
 	)
 	err := musicSourceCmd.Start()
 	if err != nil {
-		return err
+		return errors.New(fmt.Sprintf("failed to start music process, err: %v", err))
 	}
 	i.sourceProcess = musicSourceCmd.Process
 
 	err = musicSourceCmd.Wait()
 	if err != nil {
-		return err
+		return errors.New(fmt.Sprintf("failed to wait music process, err: %v", err))
 	}
 
 	silentSourceCmd := exec.Command(
@@ -160,7 +161,7 @@ func (i *voiceInstance) PlayMusic(input string) error {
 	)
 	err = silentSourceCmd.Start()
 	if err != nil {
-		return err
+		return errors.New(fmt.Sprintf("failed to start slient source process, err: %v", err))
 	}
 	i.sourceProcess = silentSourceCmd.Process
 
