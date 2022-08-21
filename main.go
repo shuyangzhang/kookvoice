@@ -8,3 +8,15 @@ func Play(token string, channelId string, input string) {
 	go keepRecieveMessage(connect)
 	streamAudio(rtpUrl, input)
 }
+
+func New(token string, channelId string) (*voiceInstance, error) {
+	vi := voiceInstance{
+		Token:     token,
+		ChannelId: channelId,
+	}
+	err := vi.Init()
+	if err != nil {
+		return nil, err
+	}
+	return &vi, nil
+}
