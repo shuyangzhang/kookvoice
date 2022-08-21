@@ -105,7 +105,7 @@ func (i *voiceInstance) Init() error {
 
 func (i *voiceInstance) PlayMusic(input string) error {
 	if err := i.sourceProcess.Kill(); err != nil {
-		return nil
+		return err
 	}
 
 	musicSourceCmd := exec.Command(
