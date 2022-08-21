@@ -27,8 +27,9 @@ func (i *voiceInstance) Init() error {
 	}
 
 	keepFifoOpenCmd := exec.Command(
-		"exec",
-		"7<>streampipe",
+		"bash",
+		"-c",
+		"exec 7<>streampipe",
 	)
 	err = keepFifoOpenCmd.Run()
 	if err != nil {
