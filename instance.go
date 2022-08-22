@@ -36,33 +36,18 @@ func (i *voiceInstance) Init() error {
 	if err != nil {
 		return err
 	}
-	/*
-		silentSourceCmd := exec.Command(
-			"ffmpeg",
-			"-f",
-			"lavfi",
-			"-i",
-			"anullsrc",
-			"-f",
-			"wav",
-			"-c:a",
-			"pcm_s16le",
-			"-b:a",
-			"1411200",
-			"-ar",
-			"44.1k",
-			"-ac",
-			"2",
-			"pipe:1",
-			">",
-			"streampipe",
-		)
-		err = silentSourceCmd.Start()
-		if err != nil {
-			return err
-		}
-		i.sourceProcess = silentSourceCmd.Process
-	*/
+
+	silentSourceCmd := exec.Command(
+		"bash",
+		"-c",
+		"ffmpeg -f lavfi -i anullsrc -f wav -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe",
+	)
+	err = silentSourceCmd.Start()
+	if err != nil {
+		return err
+	}
+	i.sourceProcess = silentSourceCmd.Process
+
 	gatewayUrl := getGatewayUrl(i.Token, i.ChannelId)
 	connect, rtpUrl := initWebsocketClient(gatewayUrl)
 
@@ -105,58 +90,44 @@ func (i *voiceInstance) Init() error {
 }
 
 func (i *voiceInstance) PlayMusic(input string) error {
-	warmUpCmd := exec.Command(
-		"ffmpeg",
-		"-f",
-		"lavfi",
-		"-t",
-		"0.0001",
-		"-i",
-		"anullsrc",
-		"-f",
-		"wav",
-		"-c:a",
-		"pcm_s16le",
-		"-b:a",
-		"1411200",
-		"-ar",
-		"44.1k",
-		"-ac",
-		"2",
-		"pipe:1",
-		">",
-		"streampipe",
-	)
-	err := warmUpCmd.Run()
-
 	/*
-		if err := i.sourceProcess.Kill(); err != nil {
-			return errors.New(fmt.Sprintf("failed to kill source process, err: %v", err))
-		}
-		_, err := i.sourceProcess.Wait()
-		if err != nil {
-			return errors.New(fmt.Sprintf("failed to wait source process exit, err: %v", err))
-		}
+		warmUpCmd := exec.Command(
+			"ffmpeg",
+			"-f",
+			"lavfi",
+			"-t",
+			"0.0001",
+			"-i",
+			"anullsrc",
+			"-f",
+			"wav",
+			"-c:a",
+			"pcm_s16le",
+			"-b:a",
+			"1411200",
+			"-ar",
+			"44.1k",
+			"-ac",
+			"2",
+			"pipe:1",
+			">",
+			"streampipe",
+		)
+		err := warmUpCmd.Run()
 	*/
 
+	if err := i.sourceProcess.Kill(); err != nil {
+		return errors.New(fmt.Sprintf("failed to kill source process, err: %v", err))
+	}
+	_, err := i.sourceProcess.Wait()
+	if err != nil {
+		return errors.New(fmt.Sprintf("failed to wait source process exit, err: %v", err))
+	}
+
 	musicSourceCmd := exec.Command(
-		"ffmpeg",
-		"-re",
-		"-i",
-		input,
-		"-f",
-		"s16le",
-		"-c:a",
-		"pcm_s16le",
-		"-b:a",
-		"1411200",
-		"-ar",
-		"44.1k",
-		"-ac",
-		"2",
-		"pipe:1",
-		">",
-		"streampipe",
+		"bash",
+		"-c",
+		fmt.Sprintf("ffmpeg -re -i %v -f s16le -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe", input),
 	)
 	err = musicSourceCmd.Start()
 	if err != nil {
@@ -170,24 +141,9 @@ func (i *voiceInstance) PlayMusic(input string) error {
 	}
 
 	silentSourceCmd := exec.Command(
-		"ffmpeg",
-		"-f",
-		"lavfi",
-		"-i",
-		"anullsrc",
-		"-f",
-		"wav",
-		"-c:a",
-		"pcm_s16le",
-		"-b:a",
-		"1411200",
-		"-ar",
-		"44.1k",
-		"-ac",
-		"2",
-		"pipe:1",
-		">",
-		"streampipe",
+		"bash",
+		"-c",
+		"ffmpeg -f lavfi -i anullsrc -f wav -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe",
 	)
 	err = silentSourceCmd.Start()
 	if err != nil {
