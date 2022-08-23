@@ -102,16 +102,16 @@ func (i *voiceInstance) PlayMusic(input string) error {
 		fmt.Sprintf("ffmpeg -re -i %v -f s16le -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe", input),
 	)
 	musicSourceCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	err := musicSourceCmd.Start()
+	err := musicSourceCmd.Run()
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to start music process, err: %v", err))
 	}
 	i.sourceProcess = musicSourceCmd.Process
 
-	err = musicSourceCmd.Wait()
-	if err != nil {
-		return errors.New(fmt.Sprintf("failed to wait music process, err: %v", err))
-	}
+	//err = musicSourceCmd.Wait()
+	//if err != nil {
+	//	return errors.New(fmt.Sprintf("failed to wait music process, err: %v", err))
+	//}
 
 	silentSourceCmd := exec.Command(
 		"bash",
