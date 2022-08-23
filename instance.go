@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -92,6 +93,7 @@ func (i *voiceInstance) Init() error {
 }
 
 func (i *voiceInstance) PlayMusic(input string) error {
+	time.Sleep(500 * time.Millisecond)
 	if err := syscall.Kill(-i.sourceProcess.Pid, syscall.SIGKILL); err != nil {
 		return errors.New(fmt.Sprintf("failed to kill source process, err: %v", err))
 	}
@@ -102,16 +104,16 @@ func (i *voiceInstance) PlayMusic(input string) error {
 		fmt.Sprintf("ffmpeg -re -i %v -f s16le -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe", input),
 	)
 	musicSourceCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	err := musicSourceCmd.Run()
+	err := musicSourceCmd.Start()
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to start music process, err: %v", err))
 	}
 	i.sourceProcess = musicSourceCmd.Process
 
-	//err = musicSourceCmd.Wait()
-	//if err != nil {
-	//	return errors.New(fmt.Sprintf("failed to wait music process, err: %v", err))
-	//}
+	err = musicSourceCmd.Wait()
+	if err != nil {
+		return errors.New(fmt.Sprintf("failed to wait music process, err: %v", err))
+	}
 
 	silentSourceCmd := exec.Command(
 		"bash",
@@ -125,5 +127,16 @@ func (i *voiceInstance) PlayMusic(input string) error {
 	}
 	i.sourceProcess = silentSourceCmd.Process
 
+	return nil
+}
+
+func (i *voiceInstance) Close() error {
+	if _, err := os.Stat("streampipe"); errors.Is(err, os.ErrNotExist) {
+		fmt.Println("stream pipe is not exist")
+	}
+	err := os.Remove("streampipe")
+	if err != nil {
+		return err
+	}
 	return nil
 }
