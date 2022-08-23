@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"syscall"
 
 	"github.com/gorilla/websocket"
 )
@@ -42,6 +43,7 @@ func (i *voiceInstance) Init() error {
 		"-c",
 		"ffmpeg -f lavfi -i anullsrc -f wav -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe",
 	)
+	silentSourceCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	err = silentSourceCmd.Start()
 	if err != nil {
 		return err
@@ -90,33 +92,7 @@ func (i *voiceInstance) Init() error {
 }
 
 func (i *voiceInstance) PlayMusic(input string) error {
-	/*
-		warmUpCmd := exec.Command(
-			"ffmpeg",
-			"-f",
-			"lavfi",
-			"-t",
-			"0.0001",
-			"-i",
-			"anullsrc",
-			"-f",
-			"wav",
-			"-c:a",
-			"pcm_s16le",
-			"-b:a",
-			"1411200",
-			"-ar",
-			"44.1k",
-			"-ac",
-			"2",
-			"pipe:1",
-			">",
-			"streampipe",
-		)
-		err := warmUpCmd.Run()
-	*/
-
-	if err := i.sourceProcess.Kill(); err != nil {
+	if err := syscall.Kill(-i.sourceProcess.Pid, syscall.SIGKILL); err != nil {
 		return errors.New(fmt.Sprintf("failed to kill source process, err: %v", err))
 	}
 	_, err := i.sourceProcess.Wait()
@@ -129,6 +105,7 @@ func (i *voiceInstance) PlayMusic(input string) error {
 		"-c",
 		fmt.Sprintf("ffmpeg -re -i %v -f s16le -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe", input),
 	)
+	musicSourceCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	err = musicSourceCmd.Start()
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to start music process, err: %v", err))
@@ -145,6 +122,7 @@ func (i *voiceInstance) PlayMusic(input string) error {
 		"-c",
 		"ffmpeg -f lavfi -i anullsrc -f wav -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe",
 	)
+	silentSourceCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	err = silentSourceCmd.Start()
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to start slient source process, err: %v", err))
