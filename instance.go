@@ -95,10 +95,6 @@ func (i *voiceInstance) PlayMusic(input string) error {
 	if err := syscall.Kill(-i.sourceProcess.Pid, syscall.SIGKILL); err != nil {
 		return errors.New(fmt.Sprintf("failed to kill source process, err: %v", err))
 	}
-	_, err := i.sourceProcess.Wait()
-	if err != nil {
-		return errors.New(fmt.Sprintf("failed to wait source process exit, err: %v", err))
-	}
 
 	musicSourceCmd := exec.Command(
 		"bash",
@@ -106,7 +102,7 @@ func (i *voiceInstance) PlayMusic(input string) error {
 		fmt.Sprintf("ffmpeg -re -i %v -f s16le -c:a pcm_s16le -b:a 1411200 -ar 44.1k -ac 2 pipe:1 > streampipe", input),
 	)
 	musicSourceCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	err = musicSourceCmd.Start()
+	err := musicSourceCmd.Start()
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to start music process, err: %v", err))
 	}
